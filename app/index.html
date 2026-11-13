@@ -1,0 +1,137 @@
+<!doctype html>
+<!-- Página de ClasificaIA: formulario que llama a POST /predict con fetch.
+En su proyecto cambian los campos del formulario por las variables de su modelo. -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClasificaIA</title>
+  <style>
+    body { 
+      font-family: system-ui, sans-serif; 
+      max-width: 420px; 
+      margin: 2rem auto; 
+      padding: 0 1rem;
+    }
+    label { 
+      display: block; 
+      margin-bottom: 0.6rem; 
+    }
+    input { 
+      width: 100%; 
+      padding: 6px; 
+      box-sizing: border-box;
+    }
+    button { 
+      padding: 6px 14px; 
+      cursor: pointer;
+    }
+    #resultado { 
+      font-weight: bold; 
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>ClasificaIA</h1>
+  <p>Escribe las medidas de una flor (cm) y el modelo dirá su especie.</p>
+
+  <form id="formulario">
+    <!-- name debe coincidir con los campos de la clase Flor en app/main.py -->
+    <label>Largo del sépalo
+      <input name="largo_sepalo" type="number" step="0.1" value="5.1" required>
+    </label>
+    <label>Ancho del sépalo
+      <input name="ancho_sepalo" type="number" step="0.1" value="3.5" required>
+    </label>
+    <label>Largo del pétalo
+      <input name="largo_petalo" type="number" step="0.1" value="1.4" required>
+    </label>
+    <label>Ancho del pétalo
+      <input name="ancho_petalo" type="number" step="0.1" value="0.2" required>
+    </label>
+
+    <!-- Hito 4: si la API exige llave, se escribe aquí (no se guarda en el código) -->
+    <label>Llave de acceso (opcional)
+      <input id="llave" type="password" autocomplete="off">
+    </label>
+
+    <button type="submit">Clasificar</button>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+    const formulario = document.getElementById('formulario');
+    const resultado = document.getElementById('resultado');
+
+    formulario.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultado.textContent = 'Clasificando...';
+
+      // Convertir los datos del formulario a un objeto JSON
+      const formData = new FormData(formulario);
+      const datos = {};
+      formData.forEach((value, key) => {
+        datos[key] = parseFloat(value);
+      });
+
+      // Obtener la llave si se ingresó
+      const apiKey = document.getElementById('llave').value.trim();
+      const headers = { 'Content-Type': 'application/json' };
+      if (apiKey) {
+        headers['x-api-key'] = apiKey;
+      }
+
+      try {
+        const respuesta = await fetch('/predict', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(datos)
+        });
+
+        const data = await respuesta.json();
+
+        if (!respuesta.ok) {
+          throw new Error(data.detail || 'Error al procesar la predicción');
+        }
+
+        resultado.textContent = `Resultado: ${data.clase} (Confianza: ${(data.confianza * 100).toFixed(1)}%)`;
+      } catch (error) {
+        resultado.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
+<script>
+    // Al enviar el formulario: arma un objeto JSON con los campos y llama a la API
+    document.getElementById("formulario").addEventListener("submit", async (evento) => {
+      evento.preventDefault(); // no recargar la página
+
+      const campos = new FormData(evento.target);
+      const datos = {};
+      for (const [nombre, valor] of campos) {
+        datos[nombre] = parseFloat(valor);
+      }
+
+      const cabeceras = { "Content-Type": "application/json" };
+      const llave = document.getElementById("llave").value;
+      if (llave) {
+        cabeceras["x-api-key"] = llave; // solo si el usuario la escribió
+      }
+
+      const resp = await fetch("/predict", {
+        method: "POST",
+        headers: cabeceras,
+        body: JSON.stringify(datos),
+      });
+
+      const json = await resp.json();
+      document.getElementById("resultado").textContent = resp.ok
+        ? `${json.clase} (confianza ${json.confianza})`
+        : "Datos inválidos: revisa los valores";
+    });
+  </script>
+</body>
+</html>
