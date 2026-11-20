@@ -6,6 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY modelo/ ./modelo/
+COPY datos/ ./datos/
 # Entrenar al construir garantiza la misma versión de scikit-learn al entrenar y servir
 RUN python modelo/entrenar.py
 # Usuario sin privilegios: si alguien vulnera la API, no es root en el contenedor
