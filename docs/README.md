@@ -12,7 +12,7 @@ Equipo 2
 
 El proyecto consiste en desarrollar una aplicación que permita predecir la calidad de un vino a partir de sus características fisicoquímicas, como la acidez, el pH, la densidad y el contenido de alcohol. El propósito es utilizar técnicas de aprendizaje automático para generar predicciones basadas en el análisis de los datos.
 
-## **2. Datos**
+## **2. Fuente y licencia de los Datos**
 
 Se utilizará el conjunto de datos **Wine Quality**, que contiene muestras de vino con diferentes variables fisicoquímicas, entre ellas:
 - Acidez fija y volátil.
@@ -24,6 +24,13 @@ Se utilizará el conjunto de datos **Wine Quality**, que contiene muestras de vi
 - Contenido de alcohol.
 Estos datos servirán para entrenar y probar el modelo de aprendizaje automático.
 
+**Fuente y licencia de los datos:**
+**Origen:** UCI Machine Learning Repository, conjunto *Wine Quality* (Cortez et al., 2009).
+**URL:** https://archive.ics.uci.edu/dataset/186/wine+quality
+**Licencia:** Creative Commons Attribution 4.0 International (CC BY 4.0), que permite compartir y adaptar los datos con el crédito correspondiente.
+**Tamaño:** vino tinto, 1,599 muestras originales (1,359 tras eliminar duplicados), con 11 variables fisicoquímicas y la calidad (0 a 10) como variable objetivo.
+**Cita:** Cortez, P., Cerdeira, A., Almeida, F., Matos, T., & Reis, J. (2009). Wine Quality [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C56S3T
+
 ## **3. Algoritmo**
 
 Se implementará un **árbol de decisión (Decision Tree)** mediante el lenguaje de programación Python y la biblioteca Scikit-learn.
@@ -34,6 +41,11 @@ Este algoritmo analizará las características de cada muestra de vino para iden
 Se utilizarán las siguientes métricas para evaluar el rendimiento del modelo:
 - **Accuracy (Exactitud):** medirá el porcentaje de predicciones correctas realizadas por el modelo.
 - **F1-score:** permitirá evaluar el equilibrio entre la precisión y la capacidad del modelo para identificar correctamente las diferentes categorías de calidad.
+
+**Meta numérica y resultado:**
+**Meta:** Accuracy ≥ 0.50 y F1-score ponderado ≥ 0.50 sobre el conjunto de prueba (30 % de los datos).
+**Resultado obtenido (árbol de decisión de profundidad máxima 5, vino tinto, semilla 42):** Accuracy = 0.54 y F1-score ponderado = 0.52.
+**Observación:** el modelo acierta principalmente en las calidades 5 y 6, que concentran la mayoría de las muestras; en las calidades extremas (3, 4 y 8) casi no acierta por su escasez, lo que confirma el riesgo de desbalance de datos.
 
 ## **5. Recursos de cómputo y herramientas**
 
