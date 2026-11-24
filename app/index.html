@@ -6,109 +6,309 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ClasificaIA - Calidad de Vinos</title>
   <style>
-    body { 
-      font-family: system-ui, sans-serif; 
-      max-width: 420px; 
-      margin: 2rem auto; 
-      padding: 0 1rem;
+    :root {
+      --vino-primario: #722f37;
+      --vino-oscuro: #521f25;
+      --vino-suave: #fdf6f7;
+      --fondo: #f4f5f7;
+      --tarjeta: #ffffff;
+      --texto: #1f2937;
+      --texto-secundario: #6b7280;
+      --borde: #d1d5db;
     }
-    label { 
-      display: block; 
-      margin-bottom: 0.6rem; 
-    }
-    input { 
-      width: 100%; 
-      padding: 6px; 
+
+    * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    button { 
-      padding: 8px 16px; 
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 100%);
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .contenedor {
+      background: var(--tarjeta);
+      width: 100%;
+      max-width: 680px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .encabezado {
+      background: linear-gradient(135deg, var(--vino-primario), var(--vino-oscuro));
+      color: #ffffff;
+      padding: 1.75rem 2rem;
+    }
+
+    .encabezado h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .encabezado p {
+      font-size: 0.92rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    form {
+      padding: 2rem;
+    }
+
+    .grid-campos {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem 1.25rem;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .campo.ancho-completo {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--texto);
+      margin-bottom: 0.35rem;
+    }
+
+    label span {
+      font-weight: 400;
+      color: var(--texto-secundario);
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--texto);
+      background-color: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--vino-primario);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.15);
+    }
+
+    .separador {
+      border: 0;
+      border-top: 1px solid #e5e7eb;
+      margin: 1.5rem 0;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.85rem 1.5rem;
+      background-color: var(--vino-primario);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 0.5rem;
+      transition: background-color 0.2s, transform 0.1s;
     }
-    #resultado { 
-      font-weight: bold; 
-      margin-top: 1rem;
+
+    button:hover {
+      background-color: var(--vino-oscuro);
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #resultado {
+      margin: 0 2rem 2rem;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1rem;
+      display: none;
+    }
+
+    #resultado.exito {
+      display: block;
+      background-color: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    #resultado.error {
+      display: block;
+      background-color: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    @media (max-width: 560px) {
+      .grid-campos {
+        grid-template-columns: 1fr;
+      }
+      .encabezado, form {
+        padding: 1.5rem;
+      }
+      #resultado {
+        margin: 0 1.5rem 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>ClasificaIA - Calidad de Vinos</h1>
-  <p>Escribe las propiedades fisicoquímicas del vino y el modelo dirá su calidad.</p>
+  <main class="contenedor">
+    <header class="encabezado">
+      <h1>ClasificaIA · Calidad de Vinos</h1>
+      <p>Ingresa las propiedades fisicoquímicas de la muestra para predecir su calidad mediante el modelo entrenado.</p>
+    </header>
 
-  <form id="formulario">
-    <!-- name coincide EXACTAMENTE con los campos de la clase Vino en app/main.py -->
-    <label>Acidez fija (g/dm³)
-      <input name="acidez_fija" type="number" step="any" min="3" max="20" value="7.4" required>
-    </label>
-    <label>Acidez volátil (g/dm³)
-      <input name="acidez_volatil" type="number" step="any" min="0" max="2.5" value="0.7" required>
-    </label>
-    <label>Ácido cítrico (g/dm³)
-      <input name="acido_citrico" type="number" step="any" min="0" max="1.5" value="0.0" required>
-    </label>
-    <label>Azúcar residual (g/dm³)
-      <input name="azucar_residual" type="number" step="any" min="0" max="30" value="1.9" required>
-    </label>
-    <label>Cloruros (g/dm³)
-      <input name="cloruros" type="number" step="any" min="0" max="1" value="0.076" required>
-    </label>
-    <label>Dióxido de azufre libre (mg/dm³)
-      <input name="dioxido_azufre_libre" type="number" step="any" min="0" max="100" value="11.0" required>
-    </label>
-    <label>Dióxido de azufre total (mg/dm³)
-      <input name="dioxido_azufre_total" type="number" step="any" min="0" max="400" value="34.0" required>
-    </label>
-    <label>Densidad (g/cm³)
-      <input name="densidad" type="number" step="any" min="0.98" max="1.01" value="0.9978" required>
-    </label>
-    <label>pH
-      <input name="ph" type="number" step="any" min="2" max="5" value="3.51" required>
-    </label>
-    <label>Sulfatos (g/dm³)
-      <input name="sulfatos" type="number" step="any" min="0" max="3" value="0.56" required>
-    </label>
-    <label>Alcohol (% vol)
-      <input name="alcohol" type="number" step="any" min="5" max="20" value="9.4" required>
-    </label>
+    <form id="formulario">
+      <!-- name coincide EXACTAMENTE con los campos de la clase Vino en app/main.py -->
+      <div class="grid-campos">
+        <div class="campo">
+          <label for="acidez_fija">Acidez fija <span>(g/dm³)</span></label>
+          <input id="acidez_fija" name="acidez_fija" type="number" step="any" min="3" max="20" value="7.4" required>
+        </div>
 
-    <!-- Hito 4: si la API exige llave, se escribe aquí (no se guarda en el código) -->
-    <label>Llave de acceso (opcional)
-      <input id="llave" type="password" autocomplete="off">
-    </label>
+        <div class="campo">
+          <label for="acidez_volatil">Acidez volátil <span>(g/dm³)</span></label>
+          <input id="acidez_volatil" name="acidez_volatil" type="number" step="any" min="0" max="2.5" value="0.7" required>
+        </div>
 
-    <button type="submit">Clasificar</button>
-  </form>
+        <div class="campo">
+          <label for="acido_citrico">Ácido cítrico <span>(g/dm³)</span></label>
+          <input id="acido_citrico" name="acido_citrico" type="number" step="any" min="0" max="1.5" value="0.0" required>
+        </div>
 
-  <p id="resultado"></p>
+        <div class="campo">
+          <label for="azucar_residual">Azúcar residual <span>(g/dm³)</span></label>
+          <input id="azucar_residual" name="azucar_residual" type="number" step="any" min="0" max="30" value="1.9" required>
+        </div>
+
+        <div class="campo">
+          <label for="cloruros">Cloruros <span>(g/dm³)</span></label>
+          <input id="cloruros" name="cloruros" type="number" step="any" min="0" max="1" value="0.076" required>
+        </div>
+
+        <div class="campo">
+          <label for="dioxido_azufre_libre">Dióxido de azufre libre <span>(mg/dm³)</span></label>
+          <input id="dioxido_azufre_libre" name="dioxido_azufre_libre" type="number" step="any" min="0" max="100" value="11.0" required>
+        </div>
+
+        <div class="campo">
+          <label for="dioxido_azufre_total">Dióxido de azufre total <span>(mg/dm³)</span></label>
+          <input id="dioxido_azufre_total" name="dioxido_azufre_total" type="number" step="any" min="0" max="400" value="34.0" required>
+        </div>
+
+        <div class="campo">
+          <label for="densidad">Densidad <span>(g/cm³)</span></label>
+          <input id="densidad" name="densidad" type="number" step="any" min="0.98" max="1.01" value="0.9978" required>
+        </div>
+
+        <div class="campo">
+          <label for="ph">pH</label>
+          <input id="ph" name="ph" type="number" step="any" min="2" max="5" value="3.51" required>
+        </div>
+
+        <div class="campo">
+          <label for="sulfatos">Sulfatos <span>(g/dm³)</span></label>
+          <input id="sulfatos" name="sulfatos" type="number" step="any" min="0" max="3" value="0.56" required>
+        </div>
+
+        <div class="campo ancho-completo">
+          <label for="alcohol">Alcohol <span>(% vol)</span></label>
+          <input id="alcohol" name="alcohol" type="number" step="any" min="5" max="20" value="9.4" required>
+        </div>
+      </div>
+
+      <hr class="separador">
+
+      <!-- Hito 4: si la API exige llave, se escribe aquí (no se guarda en el código) -->
+      <div class="campo">
+        <label for="llave">Llave de acceso <span>(opcional)</span></label>
+        <input id="llave" type="password" placeholder="Ingresa tu x-api-key si es requerida" autocomplete="off">
+      </div>
+
+      <button type="submit" id="btn-clasificar">Clasificar muestra</button>
+    </form>
+
+    <div id="resultado" role="status" aria-live="polite"></div>
+  </main>
 
   <script>
     // Al enviar el formulario: arma un objeto JSON con los campos y llama a la API
     document.getElementById("formulario").addEventListener("submit", async (evento) => {
       evento.preventDefault(); // no recargar la página
 
-      const campos = new FormData(evento.target);
-      const datos = {};
-      for (const [nombre, valor] of campos) {
-        datos[nombre] = parseFloat(valor);
+      const boton = document.getElementById("btn-clasificar");
+      const cajaResultado = document.getElementById("resultado");
+
+      boton.disabled = true;
+      boton.textContent = "Clasificando...";
+      cajaResultado.className = "";
+      cajaResultado.style.display = "none";
+
+      try {
+        const campos = new FormData(evento.target);
+        const datos = {};
+        for (const [nombre, valor] of campos) {
+          datos[nombre] = parseFloat(valor);
+        }
+
+        const cabeceras = { "Content-Type": "application/json" };
+        const llave = document.getElementById("llave").value;
+        if (llave) {
+          cabeceras["x-api-key"] = llave; // solo si el usuario la escribió
+        }
+
+        const resp = await fetch("/predict", {
+          method: "POST",
+          headers: cabeceras,
+          body: JSON.stringify(datos),
+        });
+
+        const json = await resp.json();
+
+        if (resp.ok) {
+          cajaResultado.textContent = `Resultado: ${json.clase} (confianza ${(json.confianza * 100).toFixed(1)}%)`;
+          cajaResultado.classList.add("exito");
+        } else {
+          cajaResultado.textContent = "Datos inválidos o llave incorrecta: revisa los valores";
+          cajaResultado.classList.add("error");
+        }
+      } catch (error) {
+        cajaResultado.textContent = "Error de conexión con el servidor";
+        cajaResultado.classList.add("error");
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Clasificar muestra";
       }
-
-      const cabeceras = { "Content-Type": "application/json" };
-      const llave = document.getElementById("llave").value;
-      if (llave) {
-        cabeceras["x-api-key"] = llave; // solo si el usuario la escribió
-      }
-
-      const resp = await fetch("/predict", {
-        method: "POST",
-        headers: cabeceras,
-        body: JSON.stringify(datos),
-      });
-
-      const json = await resp.json();
-      document.getElementById("resultado").textContent = resp.ok
-        ? `${json.clase} (confianza ${(json.confianza * 100).toFixed(1)}%)`
-        : "Datos inválidos: revisa los valores";
     });
   </script>
 </body>
